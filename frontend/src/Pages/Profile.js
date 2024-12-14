@@ -55,8 +55,8 @@ export default function Profile() {
                 <div>
                     <h3>Welcome, {userDetails.fullName}!</h3>
                     <div>
-                        <p><strong>Email:</strong> {userDetails.email}</p>
                         <p><strong>Full Name:</strong> {userDetails.fullName}</p>
+                        <p><strong>Email:</strong> {userDetails.email}</p>
                     </div>
                     <button className="btn btn-primary" onClick={handleLogout}>
                         Logout

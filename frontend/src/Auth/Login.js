@@ -23,7 +23,7 @@ export default function Login() {
         try {
             await signInWithEmailAndPassword(auth, formData.email, formData.password);
             console.log("User logged in Successfully");
-            navigate("/Profile");
+            navigate("/");
             toast.success("Login successful!", {
                 position: "top-center",
             });

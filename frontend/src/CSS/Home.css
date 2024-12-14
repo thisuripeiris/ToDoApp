@@ -1,0 +1,5 @@
+.plusIcon {
+    display: flex;
+    justify-content: flex-end;
+    margin: 2% 10%;
+}

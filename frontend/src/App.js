@@ -8,6 +8,7 @@ import Home from './Pages/Home';
 import Signup from './Auth/Signup';
 import Login from './Auth/Login';
 import Profile from './Pages/Profile';
+import AboutUs from './Pages/AboutUs';
 
 function App() {
 
@@ -19,6 +20,8 @@ function App() {
           <Route path="/Signup" element={<Signup />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Profile" element={<Profile />} />
+          <Route path="/AboutUs" element={<AboutUs />} />
+
         </Routes>
         <ToastContainer />
       </div>
