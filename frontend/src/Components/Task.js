@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../Config/firebase";
-import { doc, collection, onSnapshot, query, orderBy, deleteDoc } from "firebase/firestore";
+import { doc, collection, onSnapshot, query, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../CSS/Task.css';
 import TaskDeleteModal from "../TaskDeleteModal";
+import Modal from "../Modal";
 
 export default function Task() {
     const [tasks, setTasks] = useState([]); // add task
     const [loading, setLoading] = useState(true);
     const [taskToDelete, setTaskToDelete] = useState(null); // delete task
+    const [taskToEdit, setTaskToEdit] = useState(null); // Edit task
     const navigate = useNavigate();
 
     // Fetch Data
@@ -41,6 +43,21 @@ export default function Task() {
                 navigate("/", { replace: true });
             }
         });
+    };
+
+    //Edit Data
+    const editTask = async (taskId, updatedData) => {
+        if (taskToEdit) {
+            try {
+                const userRef = doc(db, "Users", auth.currentUser.uid);
+                const taskRef = doc(userRef, "tasks", taskId);
+                await updateDoc(taskRef, updatedData);
+                console.log("Task Updated successfully!");
+                setTaskToEdit(null);
+            } catch (error) {
+                console.error("Error Updating task:", error);
+            }
+        }
     };
 
     // Delete Data
@@ -92,6 +109,12 @@ export default function Task() {
                                     <FontAwesomeIcon
                                         icon={faPenToSquare}
                                         className="editIcon"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#taskEditModal"
+                                        onClick={() => {
+                                            setTaskToEdit(task)
+                                            // console.log("Editing task:", task);
+                                        }}
                                     />
                                     <FontAwesomeIcon
                                         icon={faTrash}
@@ -108,7 +131,27 @@ export default function Task() {
                     <p>No tasks available!</p>
                 )}
             </div>
+
             <TaskDeleteModal deleteTask={deleteTask} />
+            {/* <Modal
+                task={taskToEdit}
+                onSave={(updatedData) => editTask(taskToEdit.id, updatedData)}
+                onClose={() => setTaskToEdit(null)} />
+            */}
+
+            <Modal
+                id="taskAddModal"
+                task={null}
+                onSave={(newTaskData) => console.log("Saving new task:", newTaskData)}
+                onClose={() => setTaskToEdit(null)}
+            />
+            <Modal
+                id="taskEditModal"
+                task={taskToEdit}
+                onSave={(updatedData) => editTask(taskToEdit.id, updatedData)}
+                onClose={() => setTaskToEdit(null)}
+            />
+
         </div>
     );
 }

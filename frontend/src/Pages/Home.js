@@ -16,7 +16,7 @@ export default function Home() {
                 <FontAwesomeIcon
                     icon={faCalendarPlus}
                     data-bs-toggle="modal"
-                    data-bs-target="#taskModal"
+                    data-bs-target="#taskAddModal"
                     size="3x"
                     style={{ color: '#960db9', cursor: 'pointer' }}
                 />

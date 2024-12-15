@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth, db } from "./Config/firebase";
 import { doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { toast } from "react-toastify";
 
-export default function Modal() {
+export default function Modal({ id, task, onSave, onClose }) {
+    // console.log("Task in Modal:", task);
     const [taskData, setTaskData] = useState({
         title: "",
         description: "",
     });
+
+    useEffect(() => {
+        if (task) {
+            setTaskData({ title: task.title, description: task.description });
+        } else {
+            setTaskData({ title: "", description: "" });
+        }
+    }, [task]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -16,38 +25,51 @@ export default function Modal() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const user = auth.currentUser;
+        if (task) {
+            onSave(taskData); // Update task
+        } else {
+            try {
+                const user = auth.currentUser;
 
-            if (!user) {
-                toast.error("User not logged in!");
-                return;
+                if (!user) {
+                    toast.error("User not logged in!");
+                    return;
+                }
+
+                const userRef = doc(db, "Users", user.uid); // Ref to the user doc
+                const tasksCollectionRef = collection(userRef, "tasks"); // Sub-collection 'tasks'
+
+                await addDoc(tasksCollectionRef, {
+                    title: taskData.title,
+                    description: taskData.description,
+                    createdAt: serverTimestamp(),
+                });
+
+                toast.success("Task added successfully!");
+                setTaskData({ title: "", description: "" }); // Reset form
+            } catch (error) {
+                console.error("Error adding task:", error);
+                toast.error("Failed to add task.");
             }
-
-            const userRef = doc(db, "Users", user.uid); // Ref to the user doc
-            const tasksCollectionRef = collection(userRef, "tasks"); // Sub-collection 'tasks'
-
-            await addDoc(tasksCollectionRef, {
-                title: taskData.title,
-                description: taskData.description,
-                createdAt: serverTimestamp(),
-            });
-
-            toast.success("Task added successfully!");
-            setTaskData({ title: "", description: "" }); // Reset form
-        } catch (error) {
-            console.error("Error adding task:", error);
-            toast.error("Failed to add task.");
         }
+
     };
 
     return (
-        <div className="modal fade" id="taskModal" tabIndex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+        <div className="modal fade" id={id} tabIndex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title" id="taskModalLabel">New Task</h5>
-                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 className="modal-title" id="taskModalLabel">
+                            {task ? "Edit Task" : "New Task"}
+                        </h5>
+                        <button
+                            type="button"
+                            className="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                            onClick={onClose}
+                        ></button>
                     </div>
                     <div className="modal-body">
                         <form onSubmit={handleSubmit}>
@@ -74,7 +96,9 @@ export default function Modal() {
                                     required
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">ADD</button>
+                            <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">
+                                {task ? "UPDATE" : "ADD"}
+                            </button>
                         </form>
                     </div>
                 </div>
