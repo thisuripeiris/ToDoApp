@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "./Config/firebase";
 import { doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { toast } from "react-toastify";
+import Task from "./models/task";
+
+
 
 export default function Modal({ id, task, onSave, onClose }) {
     // console.log("Task in Modal:", task);
@@ -38,12 +41,16 @@ export default function Modal({ id, task, onSave, onClose }) {
 
                 const userRef = doc(db, "Users", user.uid); // Ref to the user doc
                 const tasksCollectionRef = collection(userRef, "tasks"); // Sub-collection 'tasks'
+                var taskObj = new Task(
+                    {
+                        title: taskData.title,
+                        description: taskData.description,
+                        createdAt: serverTimestamp(),
+                    }
 
-                await addDoc(tasksCollectionRef, {
-                    title: taskData.title,
-                    description: taskData.description,
-                    createdAt: serverTimestamp(),
-                });
+                );
+                console.log("Task: " + taskObj.toJSON());
+                await addDoc(tasksCollectionRef, taskObj.toJSON());
 
                 toast.success("Task added successfully!");
                 setTaskData({ title: "", description: "" }); // Reset form

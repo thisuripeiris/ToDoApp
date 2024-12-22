@@ -4,7 +4,7 @@ import '../CSS/Home.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarPlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../Modal';
-import Task from '../Components/Task';
+import TaskPage from '../Components/TaskPage';
 
 export default function Home() {
     return (
@@ -24,7 +24,7 @@ export default function Home() {
 
             {/* Bootstrap Modal */}
             <Modal />
-            <Task />
+            <TaskPage />
         </div>
     );
 }
